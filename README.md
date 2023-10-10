@@ -12,6 +12,11 @@ python download.py <website_url> <compression> [<limit>]
 - **`<compression>`**: (Optional) Set to "compression" if you want to compress the images.
 - **`[<limit>]`**: (Optional) The maximum number of images you want to download.
 
+## Requirements
+- `requests` ~= 2.31.0
+- `beautifulsoup4` ~= 4.12.2
+- `Pillow` ~= 10.0.1 
+
 ## Description
 
 This script is designed to help users download images from a website. It starts from the provided URL and recursively visits all linked pages within the same domain, downloading images it finds. The script supports image compression using the PIL library, and users can set a limit on the number of images to download. Additionally, there's a filtering mechanism to skip downloading images with specific keywords in their names.
