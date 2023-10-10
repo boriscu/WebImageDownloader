@@ -5,7 +5,7 @@ A Python script that recursively crawls a website to download images. It provide
 ## Usage
 
 ```bash
-python script_name.py <website_url> <compression> [<limit>]
+python download.py <website_url> <compression> [<limit>]
 ```
 
 - **`<website_url>`**: The starting URL of the website you want to crawl.
