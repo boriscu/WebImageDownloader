@@ -32,6 +32,7 @@ FILTER_KEYWORDS = [
     "kategorija",
     "logo",
     "neoplanta",
+    "noscript",
 ]
 
 
