@@ -81,7 +81,9 @@ def get_response(url, max_retries=3, delay=5):
                 raise
 
 
-def download_images_from_url(url, save_path, compression, max_images):
+def download_images_from_url(
+    url, save_path, compression, max_images, depth=0, max_depth=5
+):
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -125,10 +127,11 @@ def download_images_from_url(url, save_path, compression, max_images):
         img_data = get_response(img_url).content
         with open(img_path, "wb") as img_file:
             img_file.write(img_data)
+            downloaded_images_count += 1
         if max_images != float("inf"):
             print(f"{downloaded_images_count}/{max_images} Downloaded {img_name}")
         else:
-            print(f"Downloaded {img_name}")
+            print(f"{downloaded_images_count} Downloaded {img_name}")
 
         if compression == "compression":
             compress_image(img_path)
@@ -137,8 +140,15 @@ def download_images_from_url(url, save_path, compression, max_images):
         next_url = a_tag["href"]
         next_url = urljoin(url, next_url)
         domain = urlparse(url).netloc
+        if next_url in visited_urls:
+            continue
         if urlparse(next_url).netloc == domain:
-            download_images_from_url(next_url, save_path, compression, max_images)
+            if depth < max_depth:
+                download_images_from_url(
+                    next_url, save_path, compression, max_images, depth=depth + 1
+                )
+            else:
+                print(f"Reached max depth of {max_depth}. Not visiting {next_url}.")
 
 
 if __name__ == "__main__":
@@ -149,4 +159,6 @@ if __name__ == "__main__":
     website_url = sys.argv[1]
     compression = sys.argv[2].lower()
     max_images = int(sys.argv[3]) if len(sys.argv) == 4 else float("inf")
-    download_images_from_url(website_url, SAVE_PATH, compression, max_images)
+    download_images_from_url(
+        website_url, SAVE_PATH, compression, max_images, max_depth=10
+    )
