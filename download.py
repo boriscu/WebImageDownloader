@@ -31,6 +31,7 @@ FILTER_KEYWORDS = [
     "idea",
     "kategorija",
     "logo",
+    "neoplanta",
 ]
 
 
@@ -91,7 +92,6 @@ def download_images_from_url(url, save_path, compression, max_images):
 
         img_name = sanitize_filename(os.path.basename(img_url))
         if any(keyword in img_name.lower() for keyword in FILTER_KEYWORDS):
-            print(f"Skipping {img_name} due to filter.")
             continue
 
         img_path = os.path.join(save_path, img_name)
