@@ -1,0 +1,6 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: win-64
+requests=2.31.0=pypi_0
+beautifulsoup4=4.12.2=pypi_0
+Pillow=10.0.1=pypi_0 
