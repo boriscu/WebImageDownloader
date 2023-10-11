@@ -1,12 +1,23 @@
 import os
 import sys
 import requests
+from requests.exceptions import ConnectionError
+from http.client import RemoteDisconnected
+import time
 from bs4 import BeautifulSoup
 import re
 from PIL import Image
 from urllib.parse import urlparse, urljoin
 
 SAVE_PATH = "downloaded_images"
+
+session = requests.Session()
+session.headers.update(
+    {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+)
+
 visited_urls = set()
 downloaded_images_count = 0
 
@@ -56,6 +67,20 @@ def sanitize_filename(filename):
     return s + file_ext
 
 
+def get_response(url, max_retries=3, delay=5):
+    for attempt in range(max_retries):
+        try:
+            response = session.get(url)
+            return response
+        except (ConnectionError, RemoteDisconnected) as e:
+            if attempt < max_retries - 1:
+                print(f"Error encountered: {e}. Retrying in {delay} seconds...")
+                time.sleep(delay)
+            else:
+                print("Max retries reached. Exiting.")
+                raise
+
+
 def download_images_from_url(url, save_path, compression, max_images):
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -70,7 +95,7 @@ def download_images_from_url(url, save_path, compression, max_images):
         print(f"Reached the limit of {max_images} images. Exiting.")
         return
 
-    response = requests.get(url)
+    response = get_response(url)
     soup = BeautifulSoup(response.content, "html.parser")
 
     img_tags = soup.find_all("img")
@@ -97,11 +122,13 @@ def download_images_from_url(url, save_path, compression, max_images):
 
         img_path = os.path.join(save_path, img_name)
 
-        img_data = requests.get(img_url).content
+        img_data = get_response(img_url).content
         with open(img_path, "wb") as img_file:
             img_file.write(img_data)
-
-        print(f"Downloaded {img_name}")
+        if max_images != float("inf"):
+            print(f"{downloaded_images_count}/{max_images} Downloaded {img_name}")
+        else:
+            print(f"Downloaded {img_name}")
 
         if compression == "compression":
             compress_image(img_path)
